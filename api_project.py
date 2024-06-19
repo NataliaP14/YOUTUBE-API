@@ -1,4 +1,3 @@
-import requests
 import googleapiclient.discovery
 import os
 import pprint
@@ -40,11 +39,6 @@ def get_5_videos(id, results=5):
     print('Published at: ' + item['snippet']['publishedAt'])
     print('Link: ' + 'https://www.youtube.com/watch?v=' + item['id']['videoId'] + '\n')
     
-
-
-
-
-
 
 if __name__ == '__main__':
   user_input = input("Enter a youtube channel, without spaces ")
