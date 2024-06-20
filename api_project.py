@@ -1,6 +1,7 @@
 import googleapiclient.discovery
 import os
-import pprint
+import sqlalchemy as db
+import pandas as pd
 
 
 YOUTUBE_API = os.environ.get('API_KEY')
@@ -32,16 +33,31 @@ def get_5_videos(id, results=5):
 
   response = request.execute()
 
-  print("Five Videos of " + response['items'][0]['snippet']['channelTitle'] + '\n')
-
+  videos = []
   for item in response['items']:
-    print('Title: ' + item['snippet']['title'])
-    print('Published at: ' + item['snippet']['publishedAt'])
-    print('Link: ' + 'https://www.youtube.com/watch?v=' + item['id']['videoId'] + '\n')
+    data = {
+    'Title': item['snippet']['title'],
+    'Published at': item['snippet']['publishedAt'],
+    'Link': 'https://www.youtube.com/watch?v=' + item['id']['videoId']
+    }
+    videos.append(data)
+
+  return videos
     
 
 if __name__ == '__main__':
   user_input = input("Enter a youtube channel, without spaces ")
   id = channel_id(user_input)
   if id:
-    get_5_videos(id)
+   
+    videos = get_5_videos(id)
+    videos_df = pd.DataFrame.from_dict(videos)
+
+    engine = db.create_engine('sqlite:///youtube_api.db')
+
+    videos_df.to_sql('video', con=engine, if_exists='replace', index=False)
+
+    with engine.connect() as connection:
+      query_result = connection.execute(db.text("SELECT * FROM video;")).fetchall()
+      print(pd.DataFrame(query_result))
+
