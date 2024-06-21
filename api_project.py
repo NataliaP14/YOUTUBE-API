@@ -56,16 +56,9 @@ def get_5_videos(id, results=5):
     return videos
 
 
-def user_input():
-
-    user_input = input("Enter a youtube channel, without spaces ")
-
-    return user_input
-
-
 if __name__ == '__main__':
-    input = user_input()
-    id = channel_id(input)
+    user_input = input("Enter a youtube channel, without spaces ")
+    id = channel_id(user_input)
     if id:
         videos = get_5_videos(id)
         videos_df = pd.DataFrame.from_dict(videos)
