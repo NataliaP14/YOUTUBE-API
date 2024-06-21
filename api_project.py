@@ -52,9 +52,16 @@ def get_5_videos(id, results=5):
     return videos
 
 
-if __name__ == '__main__':
+def user_input():
+
     user_input = input("Enter a youtube channel, without spaces ")
-    id = channel_id(user_input)
+
+    return user_input
+
+
+if __name__ == '__main__':
+    input = user_input()
+    id = channel_id(input)
     if id:
 
         videos = get_5_videos(id)
