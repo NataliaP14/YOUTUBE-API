@@ -2,7 +2,7 @@ import googleapiclient.discovery
 import os
 import sqlalchemy as db
 import pandas as pd
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, request
 
 
 YOUTUBE_API = os.environ.get('API_KEY')
@@ -79,17 +79,18 @@ def database_to_index():
 
             with engine.connect() as connection:
                 query_result = connection.execute(
-                      b.text("SELECT * FROM video;")
+                      db.text("SELECT * FROM video;")
                 ).fetchall()
-                result = pd.DataFrame(query_result)
-                return render_template("index.html", result)
+                result = pd.DataFrame(query_result, columns=['Title', 'Published at', 'Link'])
+                return render_template("index.html", tables=[result.to_html(classes='data')], titles=result.columns.values)
         else:
             return render_template("index.html", error = "No videos found for this channel!")
     else:
         return render_template("index.html", error = "No valid ID!")
+  return render_template("index.html")
 
 
 
 if __name__ == '__main__':
-  database_to_index()
+  app.run(debug=True, host="0.0.0.0")
     
