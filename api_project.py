@@ -2,11 +2,16 @@ import googleapiclient.discovery
 import os
 import sqlalchemy as db
 import pandas as pd
+from flask import Flask, render_template, url_for, flash, redirect
 
 
 YOUTUBE_API = os.environ.get('API_KEY')
 api_service_name = "youtube"
 api_version = "v3"
+
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')
 
 
 def channel_id(name):
@@ -56,15 +61,10 @@ def get_5_videos(id, results=5):
     return videos
 
 
-def user_input():
-
-    user_input = input("Enter a youtube channel, without spaces ")
-
-    return user_input
-
-
-if __name__ == '__main__':
-    input = user_input()
+@app.route("/", methods=['GET', 'POST'])
+def database_to_index():
+  if request.method == 'POST':
+    input = request.form['channel_name']
     id = channel_id(input)
     if id:
         videos = get_5_videos(id)
@@ -79,10 +79,17 @@ if __name__ == '__main__':
 
             with engine.connect() as connection:
                 query_result = connection.execute(
-                    db.text("SELECT * FROM video;")
+                      b.text("SELECT * FROM video;")
                 ).fetchall()
-                print(pd.DataFrame(query_result))
+                result = pd.DataFrame(query_result)
+                return render_template("index.html", result)
         else:
-            print("No videos found for this channel!")
+            return render_template("index.html", error = "No videos found for this channel!")
     else:
-        print("No valid ID found!")
+        return render_template("index.html", error = "No valid ID!")
+
+
+
+if __name__ == '__main__':
+  database_to_index()
+    
